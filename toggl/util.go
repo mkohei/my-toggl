@@ -1,14 +1,17 @@
 package toggl
 
 import (
+	"fmt"
 	"io/ioutil"
 	"net/http"
 )
 
-const BASE_URL = "https://www.toggl.com/"
+// BaseURL is base endopoint
+const BaseURL = "https://www.toggl.com"
 
+// Get request http
 func Get(url string) (body []byte, err error) {
-	resp, err := http.Get(url)
+	resp, err := http.Get(BaseURL + url)
 	if err != nil {
 		return body, err
 	}
@@ -20,11 +23,12 @@ func Get(url string) (body []byte, err error) {
 	return body, nil
 }
 
-func Get2(url string, apiToken string) (body []byte, err error) {
-	req, _ := http.NewRequest("GET", url, nil)
-	//seed := []byte(fmt.Sprintf("%s:api_token", apiToken))
-	//sEnc := base64.StdEncoding.EncodeToString(seed)
-	//req.Header.Set("Authorization", fmt.Sprintf("Basic %s", string(sEnc)))
+// GetUseBasicAuth request http with basic auth
+func GetUseBasicAuth(url string, apiToken string) (body []byte, err error) {
+	// TODO:
+	fmt.Println(url)
+
+	req, _ := http.NewRequest("GET", BaseURL+url, nil)
 	req.SetBasicAuth(apiToken, "api_token")
 
 	client := new(http.Client)
