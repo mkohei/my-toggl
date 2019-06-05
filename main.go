@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/mkohei/my-toggl/toggl"
 
@@ -17,6 +18,7 @@ func errorExit(err error) {
 
 func main() {
 	conf, err := config.LoadConfig()
+	errorExit(err)
 
 	// workspaces
 	/*
@@ -39,8 +41,21 @@ func main() {
 		errorExit(err)
 		fmt.Println(string(body))
 	*/
-	result, err := toggl.GetDetails(conf)
-	errorExit(err)
-	fmt.Println(result)
 
+	params := map[string]string{}
+	page := 0
+	for {
+		params["page"] = strconv.Itoa(page)
+		result, err := toggl.GetDetailsMonth(conf, "2019-02", params)
+		errorExit(err)
+
+		// 処理
+		fmt.Println(len(result.Data), result.PerPage, result.TotalCount, result.TotalCount/result.PerPage)
+		// 処理
+
+		page++
+		if page >= result.TotalCount/result.PerPage {
+			break
+		}
+	}
 }
