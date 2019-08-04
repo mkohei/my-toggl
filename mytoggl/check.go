@@ -36,6 +36,10 @@ func (code CheckErrorCode) String() string {
 
 // ShowErrorMessages display error message from code
 func ShowErrorMessages(errorCodes []CheckErrorCode) {
+	if len(errorCodes) == 0 {
+		return
+	}
+
 	// Header
 	fmt.Println("/// Error Messages")
 

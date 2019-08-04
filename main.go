@@ -1,8 +1,10 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/mkohei/my-toggl/mytoggl"
 	"github.com/mkohei/my-toggl/toggl"
@@ -10,11 +12,16 @@ import (
 	"github.com/mkohei/my-toggl/toggl/reports"
 )
 
+// CommandLineArgs has params from command line
+type CommandLineArgs struct {
+	targetMonth string
+}
+
 func main() {
+	commandLineArgs := getCommandLineArgs()
+
 	conf, err := toggl.LoadConfig()
 	errorExit(err)
-
-	targetMonth := "2019-08"
 
 	// Prepare Request
 	ids, err := getNeededTogglIDs(conf)
@@ -22,11 +29,9 @@ func main() {
 	requestParams := map[string]string{}
 	requestParams["workspace_id"] = strconv.Itoa(ids["workspace_id"])
 	requestParams["user_ids"] = strconv.Itoa(ids["user_id"])
-	// requestParams["workspace_id"] = strconv.Itoa(conf.UserID)
-	// requestParams["user_ids"] = strconv.Itoa(conf.WorkspaceID)
 
 	// Togglデータの取得
-	detailedRecords, err := reports.GetDetailedMonth(conf, targetMonth, requestParams)
+	detailedRecords, err := reports.GetDetailedMonth(conf, commandLineArgs.targetMonth, requestParams)
 	errorExit(err)
 
 	// チェック
@@ -37,9 +42,7 @@ func main() {
 		if err != nil {
 			errorExit(err)
 		}
-		if ok {
-			// 特に何もしなくていいかな...
-		} else {
+		if !ok {
 			showCheckErrorRecord(record, errorCode)
 			ngCount++
 			errorCodes = append(errorCodes, errorCode)
@@ -48,6 +51,20 @@ func main() {
 	// 全体結果の表示
 	mytoggl.ShowErrorMessages(errorCodes)
 	fmt.Printf("*****\nNG : %v / %v\n", ngCount, len(detailedRecords))
+}
+
+func getCommandLineArgs() CommandLineArgs {
+	flag.Parse()
+	commandLineArgs := CommandLineArgs{}
+
+	// target month
+	if flag.Arg(0) == "" {
+		t := time.Now()
+		commandLineArgs.targetMonth = t.Format("2006-01")
+	} else {
+		commandLineArgs.targetMonth = flag.Arg(0)
+	}
+	return commandLineArgs
 }
 
 // Request Toggl AUthentication API to get user_id, workspace_id

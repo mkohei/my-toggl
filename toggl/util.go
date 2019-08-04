@@ -1,7 +1,6 @@
 package toggl
 
 import (
-	"fmt"
 	"io/ioutil"
 	"net/http"
 )
@@ -25,9 +24,6 @@ func Get(url string) (body []byte, err error) {
 
 // GetUseBasicAuth request http with basic auth
 func GetUseBasicAuth(url string, apiToken string) (body []byte, err error) {
-	// TODO:
-	fmt.Println(url)
-
 	req, _ := http.NewRequest("GET", BaseURL+url, nil)
 	req.SetBasicAuth(apiToken, "api_token")
 

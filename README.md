@@ -26,5 +26,5 @@ please make `conf.json`
 ## check
 
 ```
-$ go run main.go check 2019-06
+$ go run main.go 2019-06
 ```
